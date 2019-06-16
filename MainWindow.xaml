@@ -1,0 +1,17 @@
+﻿<Window x:Class="LoginApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LoginApp"
+        xmlns:views="clr-namespace:LoginApp.Views"
+        mc:Ignorable="d"
+        Title="MangoApps for Windows" Foreground="Yellow" Height="511.744" Width="407.558" ResizeMode="CanMinimize">
+    <Grid HorizontalAlignment="Left" Width="762">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="409*"/>
+            <ColumnDefinition Width="384*"/>
+        </Grid.ColumnDefinitions>
+        <views:LoginView x:Name = "LoginViewControl" Loaded = "LoginViewControl_Loaded" Grid.ColumnSpan="2" Margin="0,0,368.6,0.4"/>
+    </Grid>
+</Window>
