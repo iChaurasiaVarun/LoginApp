@@ -64,6 +64,7 @@
     <Compile Include="Common\LoginManager.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\Utility.cs" />
+    <Compile Include="Common\Validator.cs" />
     <Compile Include="Model\ApiInfo.cs" />
     <Compile Include="Model\Request.cs" />
     <Compile Include="Model\UserDetails.cs" />

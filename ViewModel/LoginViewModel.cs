@@ -2,13 +2,7 @@
 using LoginApp.Model;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,15 +16,16 @@ namespace LoginApp.ViewModel
     {
         private readonly Login loginObject;
         private readonly LoginManager loginManager;
-        private readonly ICommand _loginCmd;
-        private readonly Utility _utility;
+        private readonly Utility utility;
+        private readonly Validator validate;
 
         public LoginViewModel()
         {
             loginObject = new Login();
             loginManager = new LoginManager();
-            _loginCmd = new RelayCommand(Login, CanLogin);
-            _utility = new Utility();
+            LoginCmd = new RelayCommand(Login, CanLogin);
+            utility = new Utility();
+            validate = new Validator(this.utility);
         }
 
 
@@ -59,7 +54,7 @@ namespace LoginApp.ViewModel
         
         public string DomainUrl
         {
-            get { if (String.IsNullOrWhiteSpace(loginObject.LoginId)) return loginObject.LoginId; return _utility.GetDomain(loginObject.LoginId);  }
+            get { return utility.GetDomain(loginObject.LoginId);  }
             set {
                 loginObject.DomainUrl = value;
                 NotifyPropertyChanged("DomainUrl");
@@ -71,7 +66,7 @@ namespace LoginApp.ViewModel
         #region Commands
 
 
-        public ICommand LoginCmd { get { return _loginCmd; } }
+        public ICommand LoginCmd { get; }
 
 
         #endregion
@@ -83,42 +78,34 @@ namespace LoginApp.ViewModel
         private void Login(object obj)
         {
             var password = (obj as PasswordBox).SecurePassword;
-            if(password.Length > 0)
-            {
-                Password = _utility.ConvertToUnsecureString(password);
-            }
-            if (!string.IsNullOrWhiteSpace(LoginId) && !string.IsNullOrWhiteSpace(Password) && this["LoginId"] == "" && this["Password"] == "")
-            {
-                //var secureString = passwordContainer.Password;
-                var login = new Login { LoginId = LoginId, Password = Password, DomainUrl = DomainUrl };
-                if (loginManager.Validate(login))
-                {
-                    MessageBox.Show("Successfull Login !!!", "Login Successful");
-                }
-                else
-                {
-                    MessageBox.Show(_utility.GetErrorMessage(), "Unable To Connect", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            Password = password.Length > 0 ? this.utility.ConvertToUnsecureString(password) : String.Empty;
+            
+            var login = new Login { LoginId = LoginId, Password = Password, DomainUrl = DomainUrl };
+            var validateResponse = this.validate.IsValid(login);
+            if (String.IsNullOrWhiteSpace(validateResponse))
+                _ = this.loginManager.Validate(login) ? MessageBox.Show("Successfull Login !!!", "Login Successful") : MessageBox.Show(utility.GetErrorMessage(), "Unable To Connect", MessageBoxButton.OK, MessageBoxImage.Error);
             else
-            {
-                if(string.IsNullOrWhiteSpace(LoginId) && string.IsNullOrWhiteSpace(Password))
-                {
-                    MessageBox.Show("Please provide details", "Login", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else if(string.IsNullOrWhiteSpace(LoginId) || this["LoginId"] != "")
-                {
-                    MessageBox.Show("Please provide valid loginId", "Login", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else if (string.IsNullOrWhiteSpace(Password) || this["Password"] != "")
-                {
-                    MessageBox.Show("Please provide valid password", "Login", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+                MessageBox.Show(validateResponse, "Login", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        
-
+        public string this[string columnName]
+        {
+            get
+            {
+                switch (columnName)
+                {
+                    case "LoginId":
+                        if (!string.IsNullOrWhiteSpace(LoginId) && !this.validate.IsValidLoginId(LoginId))
+                            return "Please enter a valid login Id.";
+                        break;
+                    case "Password":
+                        if (!string.IsNullOrWhiteSpace(Password) && !this.validate.IsValidPassword(Password))
+                            return "Please enter a valid Password.";
+                        break;
+                }
+                return string.Empty;
+            }
+        }
         private bool CanLogin(object obj)
         {
             return true;
@@ -127,26 +114,6 @@ namespace LoginApp.ViewModel
         public IEnumerable GetErrors(string propertyName)
         {
             throw new NotImplementedException();
-        }
-
-        public string this[string columnName]
-        {
-            get
-            {
-                
-                switch (columnName)
-                {
-                    case "LoginId":
-                        if (!string.IsNullOrWhiteSpace(LoginId) && (!_utility.IsValidEmail(LoginId) || !( LoginId.Length >= 4 && LoginId.Length <= 100 )))
-                            return "Please enter a valid login Id.";
-                        break;
-                    case "Password":
-                        if (!string.IsNullOrWhiteSpace(Password) && (!(Password.Length >= 5 && Password.Length <= 25)))
-                            return "Please enter a valid Password.";
-                        break;
-                }
-                return string.Empty;
-            }
         }
         public string Error { get; }
     }

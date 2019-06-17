@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoginApp.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -19,15 +20,8 @@ namespace LoginApp.ViewModel
 
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            try
-            {
-                new MailAddress(value.ToString());
-            }
-            catch (Exception)
-            {
-                return new ValidationResult(false, "Please enter a valid email.");
-            }
-            return new ValidationResult(true, null);
+            bool validFlag = new Utility().IsValidEmail(value.ToString());
+            return new ValidationResult(validFlag, validFlag ? null : "Please enter a valid email.");
         }
 
         protected void NotifyPropertyChanged(string propertyName)

@@ -17,8 +17,6 @@ namespace LoginApp.Common
     /// </summary>
     public class LoginManager
     {
-        private Utility utility = new Utility();
-
         /// <summary>
         /// To validate user information from API
         /// </summary>
@@ -31,17 +29,10 @@ namespace LoginApp.Common
                 client.BaseAddress = new Uri("https://alivance.mangoapps.com/");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var response = client.PostAsJsonAsync("apidoc", utility.GetLoginRequest(login)).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                else
-                    return false;
+                var request = new Utility().GetLoginRequest(login);
+                HttpResponseMessage response = client.PutAsJsonAsync("https://alivance.mangoapps.com/apidoc", request).Result;
+                return response.IsSuccessStatusCode;
             }
         }
-
     }
-
-
 }

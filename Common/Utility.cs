@@ -16,22 +16,18 @@ namespace LoginApp.Common
     /// </summary>
     public class Utility
     {
-        private static string domainString = "https://{0}.mangopulse.com";
-
         /// <summary>
-        /// Get domain from email
+        /// Get domain from loginId
         /// </summary>
         /// <param name="loginId"></param>
         /// <returns></returns>
         public string GetDomain(string loginId)
         {
-            if (!this.IsValidEmail(loginId))
-                return "";
+            if (String.IsNullOrWhiteSpace(loginId) || !this.IsValidEmail(loginId))
+                return string.Empty;
             MailAddress address = new MailAddress(loginId);
             string splittedHost = address.Host.Remove(address.Host.LastIndexOf("."));
-            return String.Format(domainString, splittedHost.Replace(".", "-"));
-
-
+            return String.Format("https://{0}.mangopulse.com", splittedHost.Replace(".", "-"));
         }
 
         /// <summary>
@@ -60,9 +56,7 @@ namespace LoginApp.Common
         public string ConvertToUnsecureString(SecureString securePassword)
         {
             if (securePassword == null)
-            {
                 return string.Empty;
-            }
 
             IntPtr unmanagedString = IntPtr.Zero;
             try

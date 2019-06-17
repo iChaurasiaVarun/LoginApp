@@ -24,14 +24,5 @@ namespace LoginApp.Views
         {
             InitializeComponent();
         }
-        //public System.Security.SecureString Password
-        //{
-        //    get
-        //    {
-        //        return "";//UserPassword.SecurePassword;
-        //    }
-        //}
     }
-
-    
 }
