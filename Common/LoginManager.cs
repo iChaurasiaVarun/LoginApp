@@ -30,7 +30,7 @@ namespace LoginApp.Common
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var request = new Utility().GetLoginRequest(login);
-                HttpResponseMessage response = client.PutAsJsonAsync("https://alivance.mangoapps.com/apidoc", request).Result;
+                HttpResponseMessage response = client.PostAsJsonAsync("https://alivance.mangoapps.com/apidoc", request).Result;
                 return response.IsSuccessStatusCode;
             }
         }
